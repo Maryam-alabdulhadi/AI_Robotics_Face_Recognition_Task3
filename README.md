@@ -20,13 +20,13 @@
 
 4- from Face Recognition offical website and copied the following code (source method):
 
-    $ git clone git://github.com/ageitgey/face_recognition
+    git clone git://github.com/ageitgey/face_recognition
     
 5- After that I created a dirctory on my desktop called "facerecog"
 
 6- through the terminal I enterd the dirctory path and cloned the previous source method code.
 
-7- Unfotuntly, I faced the following error " git:the term'git' is not recognized.." and fixed it with downloading GIT from the offcial website. 
+7- Unfotuntly, I faced the following error " git:the term'git' is not recognized.." and fixed it with downloading GIT from the offcial website and to check the errer has disappeared type 'git' in a new PowerShell and I noticed the error was successfully solved.
 
 8- In the same dirctory path I excuted the folllowing which took a lot of time to download the packages:
 
@@ -40,20 +40,24 @@
 
     .\activate
     
-11- Here I faced the following error "File Cannot Be Loaded Because Running Scripts Is Disabled on This System" and fixed it with this code inside windows power shell:
+11- Here I faced the following error "File Cannot Be Loaded Because Running Scripts Is Disabled on This System" and fixed it with the following steps:
+
+**First, Right click on Windows Power Shell Select "Run as administraitor"**
 
     Get-ExecutionPolicy -List
     Set-ExecutionPolicy Unrestricted
     Y
     Set-ExecutionPolicy Unrestricted -Force
     
-12- inside the enviroment I runed:
+12- inside the python virtual enviroment I runed:
 
     pip install cmake
+    pip install numpy==1.21.0
+    pip install opencv-python
     
 13- Also, which took a lot of time to download all the nesseccary packages. 
 
-    $ python setup.py install
+    python setup.py install
 
 14- I added this code to check the packages are installed "check the picture"
 
@@ -68,31 +72,66 @@
 16- Then entered:
 
     import face_recognition
+    import cv2
 
-17- 
+**Note: To activate/deactivate the virtual enviroment follow the steps:**
 
-18-
+**In CMD in the path of your project folder enter this code to Activate:**
 
-19-
+    env\Scripts\activate.bat
+        
+**To Deactivate type in the same previous path:**
 
-20-
+    deactivate
+    
+17- In visual studio code I used the following python code:
 
-21-
+    import numpy as np
+    import face_recognition as fr
+    import cv2 
 
-22-
+    video_capture = cv2.VideoCapture(0)
 
-23-
+    conner_image = fr.load_image_file("conner.jpg")
+    conner_face_encoding = fr.face_encodings(conner_image)[0]
 
-24-
+    known_face_encondings = [conner_face_encoding]
+    known_face_names = ["Conner"]
 
-25-
+    while True: 
+        ret, frame = video_capture.read()
 
-26-
+        rgb_frame = frame[:, :, ::-1]
 
-27-
+        face_locations = fr.face_locations(rgb_frame)
+        face_encodings = fr.face_encodings(rgb_frame, face_locations)
 
-28-
+        for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
 
-29-
+            matches = fr.compare_faces(known_face_encondings, face_encoding)
 
-30-
+            name = "Unknown"
+
+            face_distances = fr.face_distance(known_face_encondings, face_encoding)
+
+            best_match_index = np.argmin(face_distances)
+            if matches[best_match_index]:
+                name = known_face_names[best_match_index]
+
+            cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+
+            cv2.rectangle(frame, (left, bottom -35), (right, bottom), (0, 0, 255), cv2.FILLED)
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+
+        cv2.imshow('Webcam_facerecognition', frame)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    video_capture.release()
+    cv2.destroyAllWindows()
+
+18- Run Python file in terminal, To exit the camera (stop run) just type "q"
+
+Thank you for reading :)!
